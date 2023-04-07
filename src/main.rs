@@ -4,8 +4,8 @@
 use pc_keyboard::DecodedKey;
 use pluggable_interrupt_os::HandlerTable;
 use pluggable_interrupt_os::vga_buffer::clear_screen;
-use pluggable_interrupt_template::LetterMover;
 use crossbeam::atomic::AtomicCell;
+use pluggable_interrupt_template::Game;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -21,12 +21,12 @@ static LAST_KEY: AtomicCell<Option<DecodedKey>> = AtomicCell::new(None);
 static TICKS: AtomicCell<usize> = AtomicCell::new(0);
 
 fn cpu_loop() -> ! {
-    let mut kernel = LetterMover::new();
+    let mut kernel = Game::new();
     let mut last_tick = 0;
     loop {
         if let Some(key) = LAST_KEY.load() {
             LAST_KEY.store(None);
-            kernel.key(key);
+            kernel.key(key)
         }
         let current_tick = TICKS.load();
         if current_tick > last_tick {
